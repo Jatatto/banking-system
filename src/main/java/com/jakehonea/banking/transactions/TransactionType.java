@@ -5,8 +5,7 @@ import java.util.Arrays;
 public enum TransactionType {
 
     WITHDRAW,
-    DEPOSIT,
-    TRANSFER;
+    DEPOSIT;
 
     @Override
     public String toString() {
@@ -24,4 +23,4 @@ public enum TransactionType {
 
     }
 
-}
+    }

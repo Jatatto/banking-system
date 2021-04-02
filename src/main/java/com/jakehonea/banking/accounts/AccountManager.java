@@ -4,6 +4,7 @@ import com.jakehonea.banking.CentralBank;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AccountManager {
@@ -28,9 +29,35 @@ public class AccountManager {
 
     }
 
+    public Account getAccount(String id, String pin) {
+
+        try (Connection connection = bank.getDatabase().openConnection()) {
+
+            PreparedStatement getAccount = connection.prepareStatement("SELECT * FROM `accounts` where id=?,pin=?");
+
+            getAccount.setString(1, id);
+            getAccount.setString(2, pin);
+
+            ResultSet set = getAccount.executeQuery();
+
+            getAccount.close();
+
+            if (!set.next())
+                return null;
+
+            return new Account(bank, id, set.getDouble("balance"));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
     public Account registerAccount(String id, String pin) {
 
-        Account account = new Account(id, bank);
+        Account account = new Account(bank, id, 0);
 
         try (Connection connection = bank.getDatabase().openConnection()) {
 
@@ -87,6 +114,5 @@ public class AccountManager {
         return false;
 
     }
-
 
 }

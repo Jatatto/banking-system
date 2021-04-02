@@ -1,6 +1,7 @@
 package com.jakehonea.banking.transactions;
 
 import com.jakehonea.banking.CentralBank;
+import com.jakehonea.banking.accounts.Account;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,7 +52,7 @@ public class TransactionManager {
 
     }
 
-    public List<Transaction> fetchTransactions(String id) {
+    public List<Transaction> fetchTransactions(Account account) {
 
         List<Transaction> transactions = new ArrayList<>();
 
@@ -59,7 +60,7 @@ public class TransactionManager {
 
             PreparedStatement fetchTransactions = connection.prepareStatement("SELECT * FROM `transactions` WHERE id=?");
 
-            fetchTransactions.setString(1, id);
+            fetchTransactions.setString(1, account.getId());
 
             ResultSet set = fetchTransactions.executeQuery();
 
