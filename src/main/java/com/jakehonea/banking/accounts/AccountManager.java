@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 public class AccountManager {
 
@@ -15,7 +16,7 @@ public class AccountManager {
 
         this.bank = bank;
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS `accounts` (" +
                     "id VARCHAR(16)," +
@@ -29,18 +30,40 @@ public class AccountManager {
 
     }
 
+    public Account getAccount(String id){
+
+        try (Connection connection = bank.getDatabase().getConnection()) {
+
+            PreparedStatement getAccount = connection.prepareStatement("SELECT * FROM `accounts` where id=?");
+
+            getAccount.setString(1, id);
+
+            ResultSet set = getAccount.executeQuery();
+
+            if (!set.next())
+                return null;
+
+            return new Account(bank, id, set.getDouble("balance"));
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+
     public Account getAccount(String id, String pin) {
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
-            PreparedStatement getAccount = connection.prepareStatement("SELECT * FROM `accounts` where id=?,pin=?");
+            PreparedStatement getAccount = connection.prepareStatement("SELECT * FROM `accounts` WHERE id=? AND pin=?");
 
             getAccount.setString(1, id);
             getAccount.setString(2, pin);
 
             ResultSet set = getAccount.executeQuery();
-
-            getAccount.close();
 
             if (!set.next())
                 return null;
@@ -59,7 +82,7 @@ public class AccountManager {
 
         Account account = new Account(bank, id, 0);
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement createAccount = connection.prepareStatement("INSERT INTO `accounts` VALUES(?, ?, ?)");
 
@@ -68,6 +91,7 @@ public class AccountManager {
             createAccount.setDouble(3, 0);
 
             createAccount.execute();
+            createAccount.close();
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -79,7 +103,7 @@ public class AccountManager {
 
     public void unregisterAccount(String id) {
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement deleteAccount = connection.prepareStatement("DELETE FROM `accounts` WHERE id=?");
 
@@ -95,7 +119,7 @@ public class AccountManager {
 
     public boolean isRegistered(String id) {
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement checkRegistry = connection.prepareStatement("SELECT * FROM `accounts` WHERE id=?");
 

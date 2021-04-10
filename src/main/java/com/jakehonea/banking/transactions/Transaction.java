@@ -8,23 +8,25 @@ public class Transaction {
     private final String id;
     private final double amount;
     private final TransactionType type;
+    private final String comment;
     private long timestamp;
 
-    public Transaction(String id, double amount, TransactionType type) {
+    public Transaction(String id, double amount, String comment, TransactionType type) {
 
         this.id        = id;
         this.amount    = amount;
         this.type      = type;
         this.timestamp = System.currentTimeMillis();
+        this.comment   = comment;
 
     }
 
     public Transaction(ResultSet set)
             throws SQLException {
 
-        this(set.getString("id"), set.getDouble("amount"), TransactionType.from(set.getString("transaction-type")));
+        this(set.getString("id"), set.getDouble("amount"), set.getString("comment"), TransactionType.from(set.getString("type")));
 
-        this.timestamp = set.getLong("timestamp");
+        this.timestamp = set.getLong("time");
 
     }
 
@@ -42,5 +44,20 @@ public class Transaction {
 
     public long getTimestamp() {
         return timestamp;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction{" +
+                "id='" + id + '\'' +
+                ", amount=" + amount +
+                ", type=" + type +
+                ", comment='" + comment + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

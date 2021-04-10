@@ -3,6 +3,7 @@ package com.jakehonea.banking.transactions;
 import com.jakehonea.banking.CentralBank;
 import com.jakehonea.banking.accounts.Account;
 
+import javax.xml.validation.Validator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,13 +18,14 @@ public class TransactionManager {
     public TransactionManager(CentralBank bank) {
 
         this.bank = bank;
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS `transactions` (" +
                     "id VARCHAR(16)," +
                     "amount DOUBLE," +
-                    "transaction-type VARCHAR(12)" +
-                    "timestamp BIGINT" +
+                    "type VARCHAR(8)," +
+                    "time BIGINT," +
+                    "comment TEXT" +
                     ")");
 
         } catch (SQLException throwables) {
@@ -32,16 +34,34 @@ public class TransactionManager {
 
     }
 
+    public boolean processTransaction(Transaction transaction) {
+
+        Account account = bank.getAccountManager().getAccount(transaction.getId());
+
+        if (account != null) {
+
+            storeTransaction(transaction);
+
+            return account.processTransaction(transaction);
+
+
+        }
+
+        return false;
+
+    }
+
     public void storeTransaction(Transaction transaction) {
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
-            PreparedStatement insert = connection.prepareStatement("INSERT INTO `transactions` values(?,?,?,?)");
+            PreparedStatement insert = connection.prepareStatement("INSERT INTO `transactions` values(?,?,?,?,?)");
 
             insert.setString(1, transaction.getId());
             insert.setDouble(2, transaction.getAmount());
             insert.setString(3, transaction.getType().name().toLowerCase());
             insert.setLong(4, transaction.getTimestamp());
+            insert.setString(5, transaction.getComment());
 
             insert.execute();
             insert.close();
@@ -56,7 +76,7 @@ public class TransactionManager {
 
         List<Transaction> transactions = new ArrayList<>();
 
-        try (Connection connection = bank.getDatabase().openConnection()) {
+        try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement fetchTransactions = connection.prepareStatement("SELECT * FROM `transactions` WHERE id=?");
 

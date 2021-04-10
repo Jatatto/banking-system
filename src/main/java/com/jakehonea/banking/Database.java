@@ -1,40 +1,53 @@
 package com.jakehonea.banking;
 
 import com.jakehonea.banking.files.FileParser;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
 public class Database extends Thread {
 
-    private final HikariDataSource dataSource;
+    private Connection connection;
+    private Map<String, String> config;
 
     public Database(File databaseConfiguration)
             throws IOException {
 
-        Map<String, String> config = FileParser.parseFile(databaseConfiguration);
-        HikariConfig hikariConfig = new HikariConfig();
+        this.config = FileParser.parseFile(databaseConfiguration);
 
-        hikariConfig.setJdbcUrl("jdbc:mysql://" + config.get("sql.host") + ":" + config.get("sql.port") + "/" + config.get("sql.database"));
-        hikariConfig.setUsername(config.get("sql.username"));
-        hikariConfig.setPassword(config.get("sql.password"));
-
-        hikariConfig.setLeakDetectionThreshold(60000);
-        hikariConfig.setPoolName("bank-sql");
-
-        dataSource = new HikariDataSource(hikariConfig);
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            openConnection(config);
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public Connection openConnection()
+    private Connection openConnection(Map<String, String> config)
             throws SQLException {
 
-        return dataSource.getConnection();
+        this.connection = DriverManager.getConnection(
+                String.format("jdbc:mysql://%s:%s/%s", config.get("host"), config.get("port"), config.get("database")),
+                config.get("user"),
+                config.get("password")
+        );
+
+        return connection;
+
+    }
+
+    public Connection getConnection()
+            throws SQLException {
+
+        if (connection == null || connection.isClosed())
+            return openConnection(config);
+
+        return connection;
 
     }
 

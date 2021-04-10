@@ -25,6 +25,8 @@ public class FileParser {
         while ((line = reader.readLine()) != null) {
 
             String[] parts = line.split("=");
+            if (parts.length < 2)
+                continue;
 
             entries.put(parts[0], parts[1]);
 

@@ -1,5 +1,6 @@
 package com.jakehonea.banking;
 
+import com.jakehonea.banking.accounts.AccountManager;
 import com.jakehonea.banking.transactions.TransactionManager;
 
 import java.io.File;
@@ -9,6 +10,7 @@ public class CentralBank {
 
     private final Database database;
     private final TransactionManager transactionManager;
+    private final AccountManager accountManager;
 
     public CentralBank()
             throws IOException {
@@ -16,6 +18,7 @@ public class CentralBank {
         this.database = new Database(new File(getClass().getClassLoader().getResource("database.txt").getPath()));
 
         this.transactionManager = new TransactionManager(this);
+        this.accountManager     = new AccountManager(this);
 
     }
 
@@ -27,14 +30,8 @@ public class CentralBank {
         return transactionManager;
     }
 
-    public static void main(String[] args) {
-
-        try {
-            new CentralBank();
-        } catch (IOException e) {
-            // failed to load
-        }
-
+    public AccountManager getAccountManager() {
+        return accountManager;
     }
 
 }
