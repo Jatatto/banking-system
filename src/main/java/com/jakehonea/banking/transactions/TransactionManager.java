@@ -38,12 +38,10 @@ public class TransactionManager {
 
         Account account = bank.getAccountManager().getAccount(transaction.getId());
 
-        if (account != null) {
+        if (account != null && account.processTransaction(transaction)) {
 
             storeTransaction(transaction);
-
-            return account.processTransaction(transaction);
-
+            return true;
 
         }
 

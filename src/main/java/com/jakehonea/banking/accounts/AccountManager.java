@@ -30,7 +30,7 @@ public class AccountManager {
 
     }
 
-    public Account getAccount(String id){
+    public Account getAccount(String id) {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
@@ -105,11 +105,16 @@ public class AccountManager {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
-            PreparedStatement deleteAccount = connection.prepareStatement("DELETE FROM `accounts` WHERE id=?");
+            for (String table : new String[]{"accounts", "transactions"}) {
 
-            deleteAccount.setString(1, id);
+                PreparedStatement statement = connection.prepareStatement("DELETE FROM `" + table + "` WHERE id=?");
 
-            deleteAccount.executeUpdate();
+                statement.setString(1, id);
+
+                statement.executeUpdate();
+
+            }
+
 
         } catch (SQLException throwables) {
             throwables.printStackTrace();

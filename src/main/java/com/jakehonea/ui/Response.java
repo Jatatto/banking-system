@@ -7,12 +7,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.function.Consumer;
 
-public class Response extends JFrame {
+public class Response<T> extends JFrame {
 
     private final String question;
-    private final Consumer<String> onResponse;
+    private final Consumer<T> onResponse;
 
-    public Response(String string, Consumer<String> onResponse) {
+    public Response(String string, Consumer<T> onResponse) {
 
         super("Response");
 
@@ -48,7 +48,7 @@ public class Response extends JFrame {
 
                 if (e.getKeyChar() == '\n') {
 
-                    onResponse.accept(response.getText());
+                    onResponse.accept((T) response.getText());
                     dispose();
 
                 }

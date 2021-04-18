@@ -2,7 +2,6 @@ package com.jakehonea.ui;
 
 import com.jakehonea.banking.CentralBank;
 import com.jakehonea.banking.accounts.Account;
-import com.jakehonea.ui.account.AccountInformationUI;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -113,11 +112,35 @@ public class LoginUI extends JFrame {
                     return;
 
                 }
-                char[] password = pin.getPassword();
 
-                Account account = bank.getAccountManager().registerAccount(username.getText(), String.valueOf(password));
+                if (username.getText().length() < 2) {
 
-                Arrays.fill(password, (char) 0);
+                    JOptionPane.showMessageDialog(new JFrame(), "Username must be at least 2 characters long!", "Error:", JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+
+                String password = String.valueOf(pin.getPassword());
+
+                if (password.length() != 4) {
+
+                    JOptionPane.showMessageDialog(new JFrame(), "PIN must be 4 digits long!", "Error:", JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+
+                try {
+
+                    Integer.parseInt(password);
+
+                } catch (NumberFormatException error) {
+
+                    JOptionPane.showMessageDialog(new JFrame(), "Your PIN may only include numbers!", "Error:", JOptionPane.ERROR_MESSAGE);
+                    return;
+
+                }
+
+                Account account = bank.getAccountManager().registerAccount(username.getText(), password);
 
                 this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
                 dispose();
@@ -130,15 +153,30 @@ public class LoginUI extends JFrame {
 
         }
 
+        for (Component comp : panel.getComponents())
+            if (comp instanceof JButton)
+                cleanButton((JButton) comp, true);
+
     }
 
-    public static void main(String[] args) {
+    public static void cleanButton(JButton button, boolean border) {
 
-        try {
-            new LoginUI(new CentralBank());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (border)
+            button.setBorder(BorderFactory.createEtchedBorder());
+        else button.setBorder(BorderFactory.createEmptyBorder());
+        button.setBackground(Color.WHITE);
+        button.setFocusPainted(false);
+
+        button.getModel().addChangeListener(e -> {
+
+            ButtonModel model = (ButtonModel) e.getSource();
+
+            if (model.isPressed() || model.isSelected() || model.isRollover())
+                button.setBackground(Color.GRAY);
+            else
+                button.setBackground(Color.WHITE);
+
+        });
 
     }
 
