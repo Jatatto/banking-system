@@ -3,6 +3,11 @@ package com.jakehonea.banking.accounts;
 import com.jakehonea.banking.CentralBank;
 import com.jakehonea.banking.transactions.Transaction;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +46,63 @@ public class Account {
         }
 
         return false;
+
+    }
+
+    public ImageIcon getProfilePicture() {
+
+        try (Connection connection = bank.getDatabase().getConnection()) {
+
+            PreparedStatement getPicture = connection.prepareStatement("SELECT * FROM `accounts` WHERE id=?");
+
+            getPicture.setString(1, id);
+
+            ResultSet set = getPicture.executeQuery();
+
+            if (set.next()) {
+
+                InputStream stream = set.getBinaryStream("pfp");
+
+                if (stream != null) {
+
+                    BufferedImage image = ImageIO.read(stream);
+
+                    return new ImageIcon(image.getScaledInstance(80, 80, Image.SCALE_SMOOTH));
+
+                }
+
+            }
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            return new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("default-pfp.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
+
+    public void setProfilePicture(File file) {
+
+        try (Connection connection = bank.getDatabase().getConnection()) {
+
+            PreparedStatement setPicture = connection.prepareStatement("UPDATE `accounts` SET pfp=? WHERE id=?");
+
+            setPicture.setBinaryStream(1, new FileInputStream(file), file.length());
+            setPicture.setString(2, id);
+
+            setPicture.executeUpdate();
+
+            setPicture.close();
+
+        } catch (SQLException | FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 

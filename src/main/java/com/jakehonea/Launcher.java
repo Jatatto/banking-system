@@ -11,7 +11,8 @@ public class Launcher {
     public static void main(String[] args) {
 
         try {
-            new AccountInformationUI(new CentralBank().getAccountManager().getAccount("Jake"));
+            new AccountInformationUI(new CentralBank().getAccountManager().getAccount("Fortnite"));
+            //new LoginUI(new CentralBank());
         } catch (IOException e) {
             e.printStackTrace();
         }

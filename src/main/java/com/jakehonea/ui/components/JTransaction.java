@@ -4,6 +4,7 @@ import com.jakehonea.banking.transactions.Transaction;
 import com.jakehonea.banking.transactions.TransactionType;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -15,6 +16,8 @@ public class JTransaction extends Component {
     private DecimalFormat numberFormat;
     private DateFormat dateFormat;
 
+    private BufferedImage image;
+
     public JTransaction(Transaction transaction) {
 
         this.transaction = transaction;
@@ -24,11 +27,14 @@ public class JTransaction extends Component {
 
     }
 
-    @Override
-    public void paint(Graphics g) {
+    public void renderImage() {
 
+        if (this.image == null)
+            this.image = new BufferedImage(getBounds().width, getBounds().height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = image.getGraphics();
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
         // Background
         g.setColor(new Color(238, 238, 238));
@@ -59,4 +65,11 @@ public class JTransaction extends Component {
         g.fillRect(0, getBounds().height - 2, getBounds().width, 2);
 
     }
+
+    public BufferedImage getImage() {
+
+        return image;
+
+    }
+
 }

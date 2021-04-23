@@ -103,11 +103,12 @@ public class AccountManager {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
-            PreparedStatement createAccount = connection.prepareStatement("INSERT INTO `accounts` VALUES(?, ?, ?)");
+            PreparedStatement createAccount = connection.prepareStatement("INSERT INTO `accounts` VALUES(?, ?, ?, ?)");
 
             createAccount.setString(1, id);
             createAccount.setString(2, pin);
             createAccount.setDouble(3, 0);
+            createAccount.setBinaryStream(4, null);
 
             createAccount.execute();
             createAccount.close();

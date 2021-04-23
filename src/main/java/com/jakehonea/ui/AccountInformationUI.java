@@ -8,10 +8,14 @@ import com.jakehonea.ui.components.JTransactionList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.plaf.FileChooserUI;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.List;
 
 public class AccountInformationUI extends JFrame {
 
@@ -29,6 +33,7 @@ public class AccountInformationUI extends JFrame {
             e.printStackTrace();
         }
 
+        setResizable(false);
         setContentPane(generatePanel());
         setSize(500, 500);
 
@@ -43,32 +48,75 @@ public class AccountInformationUI extends JFrame {
         JPanel panel = new JPanel();
         panel.setLayout(null);
 
-        JPanel userInfo = new JPanel();
+        Component balance = new Component() {
+            @Override
+            public void paint(Graphics g) {
+
+                ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+
+                g.setColor(Color.GRAY);
+                g.setFont(new Font("Times New Roman", Font.BOLD, 26));
+                String balanceText = "$" + decimalFormat.format(account.getBalance());
+                g.drawString(balanceText, getWidth() - g.getFontMetrics().stringWidth(balanceText), getHeight() - 5);
+
+
+            }
+        };
         {
-            GridLayout layout = new GridLayout(2, 1);
+            balance.setSize(200, 50);
+            balance.setLocation(500 - balance.getWidth() - 30 - 8, 30);
+        }
 
-            userInfo.setLayout(layout);
+        panel.add(balance);
 
-            userInfo.add(new JLabel("ID: " + account.getId()));
-            userInfo.add(new JLabel("Balance: $" + decimalFormat.format(account.getBalance())) {
+        JLabel profilePicture = new JLabel(account.getProfilePicture());
+        {
+
+            profilePicture.setSize(80, 80);
+            profilePicture.setLocation(30, 15);
+
+            profilePicture.addMouseListener(new MouseAdapter() {
                 @Override
-                public void paint(Graphics graphics) {
+                public void mouseClicked(MouseEvent e) {
 
-                    setText("Balance: $" + decimalFormat.format(account.getBalance()));
-                    super.paint(graphics);
+                    JFileChooser fileChooser = new JFileChooser();
+
+                    FileNameExtensionFilter filter = new FileNameExtensionFilter(
+                            "JPG & PNG Images", "jpg", "png");
+                    fileChooser.setFileFilter(filter);
+                    int returnVal = fileChooser.showOpenDialog(new JFrame());
+
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+
+                        File selected = fileChooser.getSelectedFile();
+
+                        account.setProfilePicture(selected);
+
+                        try {
+                            profilePicture.setIcon(new ImageIcon(ImageIO.read(selected).getScaledInstance(80, 80, Image.SCALE_SMOOTH)));
+                        } catch (IOException ioException) {
+                            ioException.printStackTrace();
+                        }
+
+                    }
 
                 }
+
             });
 
-            userInfo.setSize(120, 50);
-            userInfo.setLocation(30, 30);
+            profilePicture.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+
         }
+        panel.add(profilePicture);
+
 
         JTransactionList pastTransactions = new JTransactionList();
         {
 
             pastTransactions.setSize(500 - (30 * 2) - 8, 300);
-            pastTransactions.setLocation(30, 90);
+            pastTransactions.setLocation(30, 100);
 
             pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
 
@@ -176,9 +224,8 @@ public class AccountInformationUI extends JFrame {
             buttons.setLocation(0, 500 - 31 - 55);
 
         }
-
-        panel.add(userInfo);
         panel.add(buttons);
+
         panel.setBorder(new EmptyBorder(10, 30, 10, 30));
 
         return panel;

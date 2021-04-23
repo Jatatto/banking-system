@@ -3,7 +3,6 @@ package com.jakehonea.ui.components;
 import com.jakehonea.banking.transactions.Transaction;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 public class JTransactionList extends Component {
 
     private List<JTransaction> transactions;
-    private int showing = 0;
+    private double showing = 0;
 
     private final int perPage;
 
@@ -23,7 +22,7 @@ public class JTransactionList extends Component {
 
         addMouseWheelListener(e -> {
 
-            showing += e.getWheelRotation();
+            showing += e.getWheelRotation() * (getBounds().height / 3.0 / 12.0 / 100.0);
             showing = Math.max(Math.min(transactions.size() - perPage, showing), 0);
 
             repaint();
@@ -35,17 +34,18 @@ public class JTransactionList extends Component {
     @Override
     public void paint(Graphics g) {
 
-        int y = 0;
-
         if (transactions.size() > 0) {
 
-            List<JTransaction> list = transactions.subList(showing, Math.min(showing + perPage, transactions.size()));
+            List<JTransaction> list = transactions.subList((int) showing, Math.min((int) Math.round(showing + 0.49) + perPage, transactions.size())); // GOOD
+
+            int y = 0;
+
+            if (list.size() == 4)
+                y = (int) -(list.get(0).getBounds().height * ((showing - (int) showing)));
 
             for (JTransaction transaction : list) {
 
-                BufferedImage image = new BufferedImage(transaction.getBounds().width, transaction.getBounds().height, BufferedImage.TYPE_INT_ARGB);
-                transaction.paint(image.getGraphics());
-                g.drawImage(image, 0, y, null);
+                g.drawImage(transaction.getImage(), 0, y, null);
 
                 y += transaction.getBounds().height;
 
@@ -54,19 +54,20 @@ public class JTransactionList extends Component {
             g.setColor(Color.LIGHT_GRAY);
             g.fillRect(getBounds().width - 8, 0, 8, getBounds().height);
 
-            g.setColor(Color.BLACK);
-            double bound = showing / (transactions.size() - 0.0);
+            g.setColor(Color.GRAY);
 
-
-            double length = getBounds().height * list.size() * (1 / (transactions.size() - 0.0));
-
-            g.fillRect(getBounds().width - 6, (int) (getBounds().height * bound) + 2, 4, (int) length - 4);
+            g.fillRect(
+                    getBounds().width - 6,
+                    (int) (getBounds().height * showing / transactions.size() + 2),
+                    4,
+                    getBounds().height * 3 / transactions.size() - 4
+            );
 
         } else {
 
             ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setFont(new Font("Times New Roman", Font.PLAIN, 20));
-            g.drawString("No Transactions.", getBounds().width / 2 - g.getFontMetrics().stringWidth("No Transactions") / 2, getBounds().height / 2 - g.getFontMetrics().getHeight() );
+            g.drawString("No Transactions.", getBounds().width / 2 - g.getFontMetrics().stringWidth("No Transactions") / 2, getBounds().height / 2 - g.getFontMetrics().getHeight());
 
         }
 
@@ -84,13 +85,14 @@ public class JTransactionList extends Component {
 
         this.transactions = transactions.stream()
                 .sorted((t1, t2) -> (int) (t2.getTimestamp() - t1.getTimestamp()))
-                .map(transaction -> {
+                .map(t -> {
 
-                    JTransaction t = new JTransaction(transaction);
+                    JTransaction transaction = new JTransaction(t);
 
-                    t.setBounds(0, 0, getBounds().width - 8, getBounds().height / 3);
+                    transaction.setBounds(0, 0, getBounds().width - 8, getBounds().height / 3);
+                    transaction.renderImage();
 
-                    return t;
+                    return transaction;
 
                 })
                 .collect(Collectors.toList());
