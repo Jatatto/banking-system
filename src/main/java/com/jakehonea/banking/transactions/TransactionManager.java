@@ -18,6 +18,7 @@ public class TransactionManager {
     public TransactionManager(CentralBank bank) {
 
         this.bank = bank;
+
         try (Connection connection = bank.getDatabase().getConnection()) {
 
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS `transactions` (" +

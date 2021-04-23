@@ -3,6 +3,7 @@ package com.jakehonea.ui;
 import com.jakehonea.banking.accounts.Account;
 import com.jakehonea.banking.transactions.Transaction;
 import com.jakehonea.banking.transactions.TransactionType;
+import com.jakehonea.ui.components.JTransactionList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,14 +21,13 @@ public class AccountInformationUI extends JFrame {
     public AccountInformationUI(Account account) {
 
         super("Account Information");
+        this.account = account;
 
         try {
             setIconImage(ImageIO.read(getClass().getClassLoader().getResource("Icon.png")));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        this.account = account;
 
         setContentPane(generatePanel());
         setSize(500, 500);
@@ -45,35 +45,34 @@ public class AccountInformationUI extends JFrame {
 
         JPanel userInfo = new JPanel();
         {
-            GridLayout layout = new GridLayout(3, 1);
+            GridLayout layout = new GridLayout(2, 1);
 
             userInfo.setLayout(layout);
 
             userInfo.add(new JLabel("ID: " + account.getId()));
             userInfo.add(new JLabel("Balance: $" + decimalFormat.format(account.getBalance())) {
                 @Override
-                public void paint(Graphics g) {
+                public void paint(Graphics graphics) {
 
                     setText("Balance: $" + decimalFormat.format(account.getBalance()));
-                    super.paint(g);
+                    super.paint(graphics);
 
                 }
             });
-            userInfo.add(new JLabel("Past Transactions: "));
 
             userInfo.setSize(120, 50);
             userInfo.setLocation(30, 30);
         }
 
-        JTextArea area = new JTextArea();
-        updateTransactions(account.getBank().getTransactionManager().fetchTransactions(account), area);
-        area.setEditable(false);
+        JTransactionList pastTransactions = new JTransactionList();
+        {
 
-        JScrollPane pastTransactions = new JScrollPane(area);
+            pastTransactions.setSize(500 - (30 * 2) - 8, 300);
+            pastTransactions.setLocation(30, 90);
 
-        pastTransactions.setSize(500 - (30 * 2) - 8, 300);
-        pastTransactions.setLocation(30, 90);
+            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
 
+        }
         panel.add(pastTransactions);
 
         Container buttons = new Container();
@@ -88,12 +87,12 @@ public class AccountInformationUI extends JFrame {
 
                     double amount = Double.parseDouble(input);
 
-                    new Response<String>("Comments:", comment -> {
+                    new Response<String>("Comment:", comment -> {
 
                         if (account.getBank().getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.DEPOSIT))) {
 
-                            updateTransactions(account.getBank().getTransactionManager().fetchTransactions(account), area);
-                            userInfo.repaint();
+                            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
+                            AccountInformationUI.this.repaint();
 
                         } else
                             JOptionPane.showMessageDialog(new JFrame(), "Error happened while processing payment!", "Error.", JOptionPane.ERROR_MESSAGE);
@@ -117,14 +116,15 @@ public class AccountInformationUI extends JFrame {
 
                     double amount = Double.parseDouble(input);
 
-                    new Response<String>("Comments:", comment -> {
+                    new Response<String>("Comment:", comment -> {
 
                         if (account.getBank().getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.WITHDRAW))) {
-                            updateTransactions(account.getBank().getTransactionManager().fetchTransactions(account), area);
-                            userInfo.repaint();
+
+                            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
+                            AccountInformationUI.this.repaint();
+
                         } else
                             JOptionPane.showMessageDialog(new JFrame(), "Insufficient funds in account to fulfill transaction.", "Error!", JOptionPane.ERROR_MESSAGE);
-
 
                     });
 
@@ -182,18 +182,6 @@ public class AccountInformationUI extends JFrame {
         panel.setBorder(new EmptyBorder(10, 30, 10, 30));
 
         return panel;
-
-    }
-
-    public void updateTransactions(List<Transaction> transactions, JTextArea area) {
-
-        area.setText("");
-
-        transactions.stream()
-                .sorted((t1, t2) -> (int) (t2.getTimestamp() - t1.getTimestamp()))
-                .forEach(transaction -> area.setText(
-                        area.getText() + "\n" + transaction.getType().toString().toUpperCase() + " of $" + decimalFormat.format(transaction.getAmount()) + ": " + transaction.getComment()
-                ));
 
     }
 

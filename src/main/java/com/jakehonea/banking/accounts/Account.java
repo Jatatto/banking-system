@@ -5,6 +5,7 @@ import com.jakehonea.banking.transactions.Transaction;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Account {
@@ -43,6 +44,12 @@ public class Account {
 
     }
 
+    public double getBalance() {
+
+        return balance;
+
+    }
+
     public void save() {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
@@ -63,10 +70,6 @@ public class Account {
 
     public CentralBank getBank() {
         return bank;
-    }
-
-    public double getBalance() {
-        return balance;
     }
 
     public String getId() {

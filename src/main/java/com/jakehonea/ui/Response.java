@@ -1,10 +1,12 @@
 package com.jakehonea.ui;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 public class Response<T> extends JFrame {
@@ -15,6 +17,12 @@ public class Response<T> extends JFrame {
     public Response(String string, Consumer<T> onResponse) {
 
         super("Response");
+
+        try {
+            setIconImage(ImageIO.read(getClass().getClassLoader().getResource("Icon.png")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         this.question   = string;
         this.onResponse = onResponse;

@@ -6,15 +6,18 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AccountManager {
 
+    private final Map<String, Account> cachedAccounts;
     private final CentralBank bank;
 
     public AccountManager(CentralBank bank) {
 
-        this.bank = bank;
+        this.bank           = bank;
+        this.cachedAccounts = new HashMap<>();
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
@@ -32,6 +35,9 @@ public class AccountManager {
 
     public Account getAccount(String id) {
 
+        if (cachedAccounts.containsKey(id))
+            return cachedAccounts.get(id);
+
         try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement getAccount = connection.prepareStatement("SELECT * FROM `accounts` where id=?");
@@ -43,7 +49,11 @@ public class AccountManager {
             if (!set.next())
                 return null;
 
-            return new Account(bank, id, set.getDouble("balance"));
+            Account account = new Account(bank, id, set.getDouble("balance"));
+
+            cachedAccounts.put(id, account);
+
+            return account;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,6 +65,9 @@ public class AccountManager {
 
 
     public Account getAccount(String id, String pin) {
+
+        if (cachedAccounts.containsKey(id))
+            return cachedAccounts.get(id);
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
@@ -68,7 +81,11 @@ public class AccountManager {
             if (!set.next())
                 return null;
 
-            return new Account(bank, id, set.getDouble("balance"));
+            Account account = new Account(bank, id, set.getDouble("balance"));
+
+            cachedAccounts.put(id, account);
+
+            return account;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -81,6 +98,8 @@ public class AccountManager {
     public Account registerAccount(String id, String pin) {
 
         Account account = new Account(bank, id, 0);
+
+        cachedAccounts.put(id, account);
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
