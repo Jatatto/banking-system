@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class JTransactionList extends Component {
 
     private List<JTransaction> transactions;
-    private double showing = 0;
+    private double scrollBarTicks = 0;
 
     private final int perPage;
 
@@ -20,10 +20,12 @@ public class JTransactionList extends Component {
 
         this.perPage = 3;
 
+        double ticksPerTransaction = 12.0;
+
         addMouseWheelListener(e -> {
 
-            showing += e.getWheelRotation() * (getBounds().height / 3.0 / 12.0 / 100.0);
-            showing = Math.max(Math.min(transactions.size() - perPage, showing), 0);
+            scrollBarTicks += e.getWheelRotation() * (getBounds().height / (perPage + 0.0) / ticksPerTransaction / 100.0);
+            scrollBarTicks = Math.max(Math.min(transactions.size() - perPage, scrollBarTicks), 0);
 
             repaint();
 
@@ -34,14 +36,13 @@ public class JTransactionList extends Component {
     @Override
     public void paint(Graphics g) {
 
+        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
         if (transactions.size() > 0) {
 
-            List<JTransaction> list = transactions.subList((int) showing, Math.min((int) Math.round(showing + 0.49) + perPage, transactions.size())); // GOOD
+            List<JTransaction> list = transactions.subList((int) scrollBarTicks, Math.min((int) Math.round(scrollBarTicks + 0.49) + perPage, transactions.size()));
 
-            int y = 0;
-
-            if (list.size() == 4)
-                y = (int) -(list.get(0).getBounds().height * ((showing - (int) showing)));
+            int y = list.size() == 4 ? (int) -(list.get(0).getBounds().height * ((scrollBarTicks - (int) scrollBarTicks))) : 0;
 
             for (JTransaction transaction : list) {
 
@@ -58,14 +59,13 @@ public class JTransactionList extends Component {
 
             g.fillRect(
                     getBounds().width - 6,
-                    (int) (getBounds().height * showing / transactions.size() + 2),
+                    (int) (getBounds().height * scrollBarTicks / transactions.size() + 2),
                     4,
-                    getBounds().height * 3 / transactions.size() - 4
+                    getBounds().height * (perPage) / transactions.size() - 4
             );
 
         } else {
 
-            ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g.setFont(new Font("Times New Roman", Font.PLAIN, 20));
             g.drawString("No Transactions.", getBounds().width / 2 - g.getFontMetrics().stringWidth("No Transactions") / 2, getBounds().height / 2 - g.getFontMetrics().getHeight());
 
@@ -73,23 +73,25 @@ public class JTransactionList extends Component {
 
     }
 
-    public List<JTransaction> getTransactions() {
-
-        return transactions;
-
-    }
-
+    /**
+     * Updates the transactions page
+     *
+     * @param transactions the transaction to display
+     */
     public void refreshTransactions(List<Transaction> transactions) {
 
-        this.showing = 0;
+        // reset the scroll bar
+        this.scrollBarTicks = 0;
 
         this.transactions = transactions.stream()
+                // sort the array from newest transactions to oldest
                 .sorted((t1, t2) -> (int) (t2.getTimestamp() - t1.getTimestamp()))
                 .map(t -> {
 
                     JTransaction transaction = new JTransaction(t);
 
-                    transaction.setBounds(0, 0, getBounds().width - 8, getBounds().height / 3);
+                    transaction.setBounds(0, 0, getBounds().width - 8, getBounds().height / perPage);
+                    // pre-render the image before ever using, helps with performance
                     transaction.renderImage();
 
                     return transaction;

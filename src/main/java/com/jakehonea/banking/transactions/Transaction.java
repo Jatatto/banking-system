@@ -30,22 +30,42 @@ public class Transaction {
 
     }
 
+    /**
+     *
+     * @return the {@link com.jakehonea.banking.accounts.Account} identifier
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     *
+     * @return the amount of the transaction
+     */
     public double getAmount() {
         return amount;
     }
 
+    /**
+     *
+     * @return the type of transaction
+     */
     public TransactionType getType() {
         return type;
     }
 
+    /**
+     *
+     * @return the {@link System#currentTimeMillis()} when the transaction was created
+     */
     public long getTimestamp() {
         return timestamp;
     }
 
+    /**
+     *
+     * @return the user entered comment describing the transaction
+     */
     public String getComment() {
         return comment;
     }

@@ -7,6 +7,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -17,6 +19,7 @@ public class LoginUI extends JFrame {
     public LoginUI(CentralBank bank) {
 
         super("Login");
+
 
         this.bank = bank;
 
@@ -57,6 +60,7 @@ public class LoginUI extends JFrame {
             usernameContainer.add(new JLabel("Account ID: "));
 
             username = new JTextField();
+            cleanTextField(username);
 
             usernameContainer.add(username);
 
@@ -71,7 +75,7 @@ public class LoginUI extends JFrame {
             passwordContainer.add(new JLabel("PIN Number: "));
 
             pin = new JPasswordField();
-
+            cleanTextField(pin);
             passwordContainer.add(pin);
 
             panel.add(passwordContainer);
@@ -159,6 +163,10 @@ public class LoginUI extends JFrame {
 
     }
 
+    /**
+     * @param button the button to apply the universal design to
+     * @param border whether the button should have a border
+     */
     public static void cleanButton(JButton button, boolean border) {
 
         if (border)
@@ -179,5 +187,26 @@ public class LoginUI extends JFrame {
         });
 
     }
+
+    public static void cleanTextField(JTextField field) {
+
+        field.setBackground(new Color(238, 238, 238));
+        field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.GRAY));
+        field.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.DARK_GRAY));
+                field.setBackground(new Color(238, 238, 238).brighter());
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                field.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.GRAY));
+                field.setBackground(new Color(238, 238, 238));
+            }
+        });
+
+    }
+
 
 }

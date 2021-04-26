@@ -35,6 +35,11 @@ public class TransactionManager {
 
     }
 
+    /**
+     *
+     * @param transaction the transaction to process
+     * @return whether the transaction was successfully processed and stored
+     */
     public boolean processTransaction(Transaction transaction) {
 
         Account account = bank.getAccountManager().getAccount(transaction.getId());
@@ -50,6 +55,10 @@ public class TransactionManager {
 
     }
 
+    /**
+     *
+     * @param transaction the {@link Transaction} to store in the {@link com.jakehonea.banking.Database}
+     */
     public void storeTransaction(Transaction transaction) {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
@@ -71,6 +80,11 @@ public class TransactionManager {
 
     }
 
+    /**
+     *
+     * @param account the account
+     * @return a list of all the user's transactions
+     */
     public List<Transaction> fetchTransactions(Account account) {
 
         List<Transaction> transactions = new ArrayList<>();

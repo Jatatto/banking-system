@@ -1,5 +1,6 @@
 package com.jakehonea.ui;
 
+import com.jakehonea.Launcher;
 import com.jakehonea.banking.accounts.Account;
 import com.jakehonea.banking.transactions.Transaction;
 import com.jakehonea.banking.transactions.TransactionType;
@@ -56,8 +57,8 @@ public class AccountInformationUI extends JFrame {
                 ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
 
-                g.setColor(Color.GRAY);
-                g.setFont(new Font("Times New Roman", Font.BOLD, 26));
+                g.setColor(Color.DARK_GRAY);
+                g.setFont(new Font("Times New Roman", Font.BOLD, 24));
                 String balanceText = "$" + decimalFormat.format(account.getBalance());
                 g.drawString(balanceText, getWidth() - g.getFontMetrics().stringWidth(balanceText), getHeight() - 5);
 
@@ -118,7 +119,7 @@ public class AccountInformationUI extends JFrame {
             pastTransactions.setSize(500 - (30 * 2) - 8, 300);
             pastTransactions.setLocation(30, 100);
 
-            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
+            pastTransactions.refreshTransactions(Launcher.BANK.getTransactionManager().fetchTransactions(account));
 
         }
         panel.add(pastTransactions);
@@ -137,9 +138,9 @@ public class AccountInformationUI extends JFrame {
 
                     new Response<String>("Comment:", comment -> {
 
-                        if (account.getBank().getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.DEPOSIT))) {
+                        if (Launcher.BANK.getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.DEPOSIT))) {
 
-                            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
+                            pastTransactions.refreshTransactions(Launcher.BANK.getTransactionManager().fetchTransactions(account));
                             AccountInformationUI.this.repaint();
 
                         } else
@@ -166,9 +167,9 @@ public class AccountInformationUI extends JFrame {
 
                     new Response<String>("Comment:", comment -> {
 
-                        if (account.getBank().getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.WITHDRAW))) {
+                        if (Launcher.BANK.getTransactionManager().processTransaction(new Transaction(account.getId(), amount, comment, TransactionType.WITHDRAW))) {
 
-                            pastTransactions.refreshTransactions(account.getBank().getTransactionManager().fetchTransactions(account));
+                            pastTransactions.refreshTransactions(Launcher.BANK.getTransactionManager().fetchTransactions(account));
                             AccountInformationUI.this.repaint();
 
                         } else
@@ -192,7 +193,7 @@ public class AccountInformationUI extends JFrame {
                 setDefaultCloseOperation(HIDE_ON_CLOSE);
                 dispose();
 
-                new LoginUI(account.getBank());
+                new LoginUI(Launcher.BANK);
 
             });
 
@@ -206,9 +207,9 @@ public class AccountInformationUI extends JFrame {
                     setDefaultCloseOperation(HIDE_ON_CLOSE);
                     dispose();
 
-                    account.getBank().getAccountManager().unregisterAccount(account.getId());
+                    Launcher.BANK.getAccountManager().unregisterAccount(account.getId());
 
-                    new LoginUI(account.getBank());
+                    new LoginUI(Launcher.BANK);
 
                 }
 

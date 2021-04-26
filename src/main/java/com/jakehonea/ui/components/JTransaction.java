@@ -33,6 +33,7 @@ public class JTransaction extends Component {
             this.image = new BufferedImage(getBounds().width, getBounds().height, BufferedImage.TYPE_INT_ARGB);
 
         Graphics g = image.getGraphics();
+        // Turning on antialiasing, makes the graphics smoother
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
@@ -43,7 +44,7 @@ public class JTransaction extends Component {
         // Comment
         g.setFont(new Font("Times New Roman", Font.BOLD, 20));
         g.setColor(Color.DARK_GRAY);
-        g.drawString(transaction.getComment(), 0, g.getFontMetrics().getHeight());
+        g.drawString(transaction.getComment(), 0, g.getFontMetrics().getHeight() * 2);
 
         // Balance
         g.setFont(new Font("Times New Roman", Font.PLAIN, 20));

@@ -4,17 +4,15 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 public class Response<T> extends JFrame {
 
     private final String question;
-    private final Consumer<T> onResponse;
+    private final Consumer<T> consumer;
 
-    public Response(String string, Consumer<T> onResponse) {
+    public Response(String string, Consumer<T> consumer) {
 
         super("Response");
 
@@ -24,11 +22,11 @@ public class Response<T> extends JFrame {
             e.printStackTrace();
         }
 
-        this.question   = string;
-        this.onResponse = onResponse;
+        this.question = string;
+        this.consumer = consumer;
 
         JPanel panel = new JPanel();
-        GridLayout layout = new GridLayout(1, 2);
+        GridLayout layout = new GridLayout(2, 2);
         layout.setHgap(10);
         layout.setVgap(10);
         panel.setLayout(layout);
@@ -49,23 +47,27 @@ public class Response<T> extends JFrame {
 
         panel.add(new JLabel(question));
 
-        JTextField response = new JTextField();
-        response.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-
-                if (e.getKeyChar() == '\n') {
-
-                    onResponse.accept((T) response.getText());
-                    dispose();
-
-                }
-
-            }
-
-        });
+        JTextField response = new JTextField(15);
+        LoginUI.cleanTextField(response);
 
         panel.add(response);
+
+        JButton cancel = new JButton("Cancel");
+
+        cancel.addActionListener(e -> dispose());
+
+        LoginUI.cleanButton(cancel, true);
+        panel.add(cancel);
+
+        JButton submit = new JButton("Proceed");
+
+        submit.addActionListener(e -> {
+            consumer.accept((T) response.getText());
+            dispose();
+        });
+
+        LoginUI.cleanButton(submit, true);
+        panel.add(submit);
 
     }
 

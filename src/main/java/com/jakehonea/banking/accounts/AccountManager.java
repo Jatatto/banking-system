@@ -33,6 +33,11 @@ public class AccountManager {
 
     }
 
+    /**
+     *
+     * @param id the identifier of the account
+     * @return the {@link Account} assiocated with the {@param id}
+     */
     public Account getAccount(String id) {
 
         if (cachedAccounts.containsKey(id))
@@ -63,7 +68,13 @@ public class AccountManager {
 
     }
 
-
+    /**
+     * This method is used to authenticate user's request in {@link com.jakehonea.ui.LoginUI}
+     *
+     * @param id the identifier of the account
+     * @param pin a four digit password
+     * @return null if no account was found, or the {@link Account} information if an account was found
+     */
     public Account getAccount(String id, String pin) {
 
         if (cachedAccounts.containsKey(id))
@@ -95,6 +106,12 @@ public class AccountManager {
 
     }
 
+    /**
+     *
+     * @param id the identifier of the account
+     * @param pin a four digit password
+     * @return the newly created {@link Account}
+     */
     public Account registerAccount(String id, String pin) {
 
         Account account = new Account(bank, id, 0);
@@ -121,6 +138,10 @@ public class AccountManager {
 
     }
 
+    /**
+     *
+     * @param id the identifier of the {@link Account} to close
+     */
     public void unregisterAccount(String id) {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
@@ -142,6 +163,11 @@ public class AccountManager {
 
     }
 
+    /**
+     *
+     * @param id the {@link Account} identifier
+     * @return whether the id is in the {@link com.jakehonea.banking.Database}
+     */
     public boolean isRegistered(String id) {
 
         try (Connection connection = bank.getDatabase().getConnection()) {

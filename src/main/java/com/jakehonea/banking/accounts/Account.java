@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,6 +28,11 @@ public class Account {
 
     }
 
+    /**
+     *
+     * @param transaction the transaction to process
+     * @return whether the transaction was successfully processed or not
+     */
     public boolean processTransaction(Transaction transaction) {
 
         switch (transaction.getType()) {
@@ -49,6 +55,12 @@ public class Account {
 
     }
 
+    /**
+     * Will return the profile picture that the user has uploaded,
+     * or return the default profile picture as an {@link ImageIcon}.
+     *
+     * @return the profile picture as a {@link ImageIcon}
+     */
     public ImageIcon getProfilePicture() {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
@@ -63,13 +75,8 @@ public class Account {
 
                 InputStream stream = set.getBinaryStream("pfp");
 
-                if (stream != null) {
-
-                    BufferedImage image = ImageIO.read(stream);
-
-                    return new ImageIcon(image.getScaledInstance(80, 80, Image.SCALE_SMOOTH));
-
-                }
+                if (stream != null)
+                    return new ImageIcon(ImageIO.read(stream));
 
             }
 
@@ -87,31 +94,59 @@ public class Account {
 
     }
 
+    /**
+     * Change's the {@link Account}'s profile picture to the given file.
+     * The file is also resized to 80x80 before being uploaded to {@link com.jakehonea.banking.Database}
+     *
+     * @param file the file to set as the profile picture
+     */
     public void setProfilePicture(File file) {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
 
             PreparedStatement setPicture = connection.prepareStatement("UPDATE `accounts` SET pfp=? WHERE id=?");
 
-            setPicture.setBinaryStream(1, new FileInputStream(file), file.length());
-            setPicture.setString(2, id);
+            try {
+                Image image = ImageIO.read(file).getScaledInstance(80, 80, Image.SCALE_SMOOTH);
 
-            setPicture.executeUpdate();
+                ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-            setPicture.close();
+                BufferedImage reformatted = new BufferedImage(80, 80, BufferedImage.TYPE_INT_ARGB);
+                reformatted.getGraphics().drawImage(image, 0, 0, null);
 
-        } catch (SQLException | FileNotFoundException e) {
+                ImageIO.write(reformatted, "png", output);
+                InputStream stream = new ByteArrayInputStream(output.toByteArray());
+
+                setPicture.setBinaryStream(1, stream, output.size());
+                setPicture.setString(2, id);
+
+                setPicture.executeUpdate();
+
+                setPicture.close();
+
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
     }
 
+    /**
+     * @return the balance of the {@link Account}
+     */
     public double getBalance() {
 
         return balance;
 
     }
 
+    /**
+     * Updates the balance of the account in the {@link com.jakehonea.banking.Database}
+     */
     public void save() {
 
         try (Connection connection = bank.getDatabase().getConnection()) {
@@ -130,10 +165,10 @@ public class Account {
 
     }
 
-    public CentralBank getBank() {
-        return bank;
-    }
-
+    /**
+     *
+     * @return the id of the {@link Account}
+     */
     public String getId() {
         return id;
     }
