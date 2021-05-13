@@ -20,7 +20,6 @@ public class LoginUI extends JFrame {
 
         super("Login");
 
-
         this.bank = bank;
 
         try {
