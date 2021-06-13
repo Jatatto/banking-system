@@ -1,4 +1,4 @@
-package com.jakehonea.banking.files;
+package banking.files;
 
 import java.io.*;
 import java.util.HashMap;

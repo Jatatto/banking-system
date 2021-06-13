@@ -1,7 +1,7 @@
-package com.jakehonea.ui;
+package ui;
 
-import com.jakehonea.banking.CentralBank;
-import com.jakehonea.banking.accounts.Account;
+import banking.CentralBank;
+import banking.accounts.Account;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

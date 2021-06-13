@@ -1,7 +1,7 @@
-package com.jakehonea.ui.components;
+package ui.components;
 
-import com.jakehonea.banking.transactions.Transaction;
-import com.jakehonea.banking.transactions.TransactionType;
+import banking.transactions.Transaction;
+import banking.transactions.TransactionType;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

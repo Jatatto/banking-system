@@ -1,6 +1,6 @@
-package com.jakehonea.banking;
+package banking;
 
-import com.jakehonea.banking.files.FileParser;
+import banking.files.FileParser;
 
 import java.io.File;
 import java.io.IOException;

@@ -1,7 +1,7 @@
-package com.jakehonea.banking;
+package banking;
 
-import com.jakehonea.banking.accounts.AccountManager;
-import com.jakehonea.banking.transactions.TransactionManager;
+import banking.accounts.AccountManager;
+import banking.transactions.TransactionManager;
 
 import java.io.File;
 import java.io.IOException;

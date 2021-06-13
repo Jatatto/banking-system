@@ -1,7 +1,6 @@
-package com.jakehonea;
+package ui;
 
-import com.jakehonea.banking.CentralBank;
-import com.jakehonea.ui.LoginUI;
+import banking.CentralBank;
 
 import java.io.IOException;
 
@@ -12,7 +11,7 @@ public class Launcher {
     public static void main(String[] args) {
 
         try {
-            new LoginUI(BANK = new CentralBank());
+            BANK = new CentralBank();
         } catch (IOException e) {
             e.printStackTrace();
         }

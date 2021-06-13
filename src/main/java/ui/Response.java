@@ -1,4 +1,4 @@
-package com.jakehonea.ui;
+package ui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

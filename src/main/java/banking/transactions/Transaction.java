@@ -1,4 +1,4 @@
-package com.jakehonea.banking.transactions;
+package banking.transactions;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -32,7 +32,7 @@ public class Transaction {
 
     /**
      *
-     * @return the {@link com.jakehonea.banking.accounts.Account} identifier
+     * @return the {@link banking.accounts.Account} identifier
      */
     public String getId() {
         return id;

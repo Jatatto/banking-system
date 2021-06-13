@@ -1,4 +1,4 @@
-package com.jakehonea.banking.transactions;
+package banking.transactions;
 
 import java.util.Arrays;
 

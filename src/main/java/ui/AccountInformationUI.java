@@ -1,16 +1,14 @@
-package com.jakehonea.ui;
+package ui;
 
-import com.jakehonea.Launcher;
-import com.jakehonea.banking.accounts.Account;
-import com.jakehonea.banking.transactions.Transaction;
-import com.jakehonea.banking.transactions.TransactionType;
-import com.jakehonea.ui.components.JTransactionList;
+import banking.accounts.Account;
+import banking.transactions.Transaction;
+import banking.transactions.TransactionType;
+import ui.components.JTransactionList;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.plaf.FileChooserUI;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

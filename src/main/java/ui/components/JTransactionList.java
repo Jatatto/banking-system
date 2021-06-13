@@ -1,6 +1,6 @@
-package com.jakehonea.ui.components;
+package ui.components;
 
-import com.jakehonea.banking.transactions.Transaction;
+import banking.transactions.Transaction;
 
 import java.awt.*;
 import java.util.ArrayList;

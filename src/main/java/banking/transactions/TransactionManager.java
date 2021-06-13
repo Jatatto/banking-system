@@ -1,9 +1,8 @@
-package com.jakehonea.banking.transactions;
+package banking.transactions;
 
-import com.jakehonea.banking.CentralBank;
-import com.jakehonea.banking.accounts.Account;
+import banking.CentralBank;
+import banking.accounts.Account;
 
-import javax.xml.validation.Validator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -57,7 +56,7 @@ public class TransactionManager {
 
     /**
      *
-     * @param transaction the {@link Transaction} to store in the {@link com.jakehonea.banking.Database}
+     * @param transaction the {@link Transaction} to store in the {@link banking.Database}
      */
     public void storeTransaction(Transaction transaction) {
 

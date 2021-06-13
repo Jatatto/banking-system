@@ -1,6 +1,6 @@
-package com.jakehonea.banking.accounts;
+package banking.accounts;
 
-import com.jakehonea.banking.CentralBank;
+import banking.CentralBank;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,7 +24,8 @@ public class AccountManager {
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS `accounts` (" +
                     "id VARCHAR(16)," +
                     "pin VARCHAR(4)," +
-                    "balance DOUBLE" +
+                    "balance DOUBLE," +
+                    "pfp LONGBLOB" +
                     ")");
 
         } catch (SQLException throwables) {
@@ -69,7 +70,7 @@ public class AccountManager {
     }
 
     /**
-     * This method is used to authenticate user's request in {@link com.jakehonea.ui.LoginUI}
+     * This method is used to authenticate user's request in {@link ui.LoginUI}
      *
      * @param id the identifier of the account
      * @param pin a four digit password
@@ -77,6 +78,7 @@ public class AccountManager {
      */
     public Account getAccount(String id, String pin) {
 
+        // Selection: Checks to see if the id is cached. If the id is in the cachedAccounts list, then return the cached account.
         if (cachedAccounts.containsKey(id))
             return cachedAccounts.get(id);
 
@@ -89,6 +91,7 @@ public class AccountManager {
 
             ResultSet set = getAccount.executeQuery();
 
+            // Iteration: Make sure the returned ResultSet contains some data
             if (!set.next())
                 return null;
 
@@ -166,7 +169,7 @@ public class AccountManager {
     /**
      *
      * @param id the {@link Account} identifier
-     * @return whether the id is in the {@link com.jakehonea.banking.Database}
+     * @return whether the id is in the {@link banking.Database}
      */
     public boolean isRegistered(String id) {
 

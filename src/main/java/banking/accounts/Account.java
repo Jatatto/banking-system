@@ -1,13 +1,12 @@
-package com.jakehonea.banking.accounts;
+package banking.accounts;
 
-import com.jakehonea.banking.CentralBank;
-import com.jakehonea.banking.transactions.Transaction;
+import banking.CentralBank;
+import banking.transactions.Transaction;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -96,7 +95,7 @@ public class Account {
 
     /**
      * Change's the {@link Account}'s profile picture to the given file.
-     * The file is also resized to 80x80 before being uploaded to {@link com.jakehonea.banking.Database}
+     * The file is also resized to 80x80 before being uploaded to {@link banking.Database}
      *
      * @param file the file to set as the profile picture
      */
@@ -145,7 +144,7 @@ public class Account {
     }
 
     /**
-     * Updates the balance of the account in the {@link com.jakehonea.banking.Database}
+     * Updates the balance of the account in the {@link banking.Database}
      */
     public void save() {
 
